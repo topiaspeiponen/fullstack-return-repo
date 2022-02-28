@@ -16,7 +16,6 @@ const App = () => {
 
   const randomizeAnecdote = () => {
     const randomNum = Math.floor(Math.random() * (anecdotes.length));
-    console.log('Random num', randomNum)
     setSelected(randomNum);
   }
 
@@ -25,6 +24,13 @@ const App = () => {
     newPoints[selected] += 1;
     setPoints(newPoints);
   };
+
+  const getMostVoted = () => {
+    const pointsCopy = points;
+    const mostVotes = Math.max(...pointsCopy);
+    const mostVotesIndex = pointsCopy.indexOf(mostVotes);
+    return mostVotesIndex
+  }
 
   return (
     <div>
@@ -38,6 +44,15 @@ const App = () => {
       <button onClick={randomizeAnecdote}>
         Next anecdote
       </button>
+      <h1>
+        Anecdote with most votes
+      </h1>
+      <p>
+        {anecdotes[getMostVoted()]}
+      </p>
+      <p>
+        has {points[getMostVoted()]} votes
+      </p>
     </div>
   )
 }
