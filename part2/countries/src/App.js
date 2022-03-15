@@ -18,11 +18,18 @@ function App() {
       })
   }, [])
 
-  const handleSearchTermChange = (event) => {
-    setSearchTerm(event.target.value)
-    const matchingCountries = countries.filter(country => country.name.common.toLowerCase().includes(event.target.value.toLowerCase()))
+  useEffect(() => {
+    const matchingCountries = countries.filter(country => country.name.common.toLowerCase().includes(searchTerm.toLowerCase()))
     console.log('Found matching countries ', matchingCountries)
     setMatchingCountries(matchingCountries, searchTerm);
+  },[searchTerm, countries])
+
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value)
+  }
+
+  const handleResultSelect = (countryName) => {
+    setSearchTerm(countryName)
   }
 
   return (
@@ -30,7 +37,7 @@ function App() {
       <Filter searchTerm={searchTerm} handleSearchTermChange={handleSearchTermChange} />
       {
         searchTerm !== '' && matchingCountries.length > 1 && matchingCountries.length <= 10 &&
-          <Countries countries={matchingCountries} />
+          <Countries countries={matchingCountries} handleResultSelect={handleResultSelect} />
       }
       {
         searchTerm !== '' && matchingCountries.length > 10 &&
