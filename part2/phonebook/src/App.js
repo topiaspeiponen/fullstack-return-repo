@@ -30,11 +30,21 @@ const App = () => {
       phonebookService
       .create(newPerson)
       .then(response => {
-        console.log(response)
-        setPersons(newPersons);
+        console.log('person added response ', response, newPersons)
         setNewName('');
         setNewPNumber('');
       })
+      .then(() => {
+        phonebookService
+        .getAll()
+        .then(persons => {
+          setPersons(persons)
+        })
+      })
+      .catch(error => {
+        console.log('Error happened during submission of new person ', error)
+      })
+      
       
     }
   };
@@ -54,6 +64,22 @@ const App = () => {
     setSearchTerm(event.target.value)
   };
 
+  const handlePersonDelete = (id) => {
+    if (window.confirm(`delete ${persons.filter(person => person.id === id)[0].name}`)) {
+      phonebookService
+      .remove(id)
+      .then(response => {
+        console.log('person deleted response ', response)
+        const newPersons = persons.filter(person => person.id !== id)
+        console.log('new persons after delete ', newPersons)
+        setPersons(newPersons)
+      })
+      .catch(error => {
+        console.log('Error happened during delete ', error)
+      })
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -61,7 +87,7 @@ const App = () => {
       <h2>Add new</h2>
       <PersonForm handleSubmit={handleSubmit} newName={newName} newPNumber={newPNumber} handleNameChange={handleNameChange} handlePhoneNumberChange={handlePhoneNumberChange} />
       <h2>Numbers</h2>
-      <Persons searchTerm={searchTerm} persons={persons} />
+      <Persons searchTerm={searchTerm} persons={persons} handlePersonDelete={handlePersonDelete} />
     </div>
   )
 
