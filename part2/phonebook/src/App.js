@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import phonebookService from './services/phonebook'
 
 const App = () => {
@@ -9,6 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPNumber, setNewPNumber] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     phonebookService
@@ -33,6 +36,10 @@ const App = () => {
           console.log('person edited response ', response)
           setNewName('');
           setNewPNumber('');
+          setSuccessMessage(`${newPerson.name} was edited succesfully`)
+          setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
         })
         .then(() => {
           phonebookService
@@ -43,6 +50,12 @@ const App = () => {
         })
         .catch(error => {
           console.log('Error happened during update of existing person ', error)
+          if (error.response.status === 404) {
+            setErrorMessage(`Information of ${newPerson.name} has already been removed from the server`)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          }
         })
       }
     } else {
@@ -53,6 +66,10 @@ const App = () => {
         console.log('person added response ', response)
         setNewName('');
         setNewPNumber('');
+        setSuccessMessage(`${newPerson.name} was added succesfully`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
       })
       .then(() => {
         phonebookService
@@ -85,7 +102,8 @@ const App = () => {
   };
 
   const handlePersonDelete = (id) => {
-    if (window.confirm(`delete ${persons.filter(person => person.id === id)[0].name}`)) {
+    const personToDelete = persons.filter(person => person.id === id)[0].name;
+    if (window.confirm(`delete ${personToDelete}`)) {
       phonebookService
       .remove(id)
       .then(response => {
@@ -93,9 +111,19 @@ const App = () => {
         const newPersons = persons.filter(person => person.id !== id)
         console.log('new persons after delete ', newPersons)
         setPersons(newPersons)
+        setSuccessMessage(`${personToDelete} was deleted succesfully`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
       })
       .catch(error => {
         console.log('Error happened during delete ', error)
+        if (error.response.status === 404) {
+          setErrorMessage(`Information of ${personToDelete} has already been removed from the server`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        }
       })
     }
   };
@@ -103,6 +131,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage} type="success" />
+      <Notification message={errorMessage} type="error" />
       <Filter searchTerm={searchTerm} handleSearchTermChange={handleSearchTermChange} />
       <h2>Add new</h2>
       <PersonForm handleSubmit={handleSubmit} newName={newName} newPNumber={newPNumber} handleNameChange={handleNameChange} handlePhoneNumberChange={handlePhoneNumberChange} />
