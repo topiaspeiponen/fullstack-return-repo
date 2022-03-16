@@ -23,14 +23,34 @@ const App = () => {
     event.preventDefault();
     console.log(persons, newName)
     if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to the phonebook`)
+      if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)) {
+        const newPerson = {name: newName, number: newPNumber}
+        const oldPersonID = persons.filter(person => person.name === newPerson.name)[0].id
+        console.log('editing person ', newPerson)
+        phonebookService
+        .update(oldPersonID, newPerson)
+        .then(response => {
+          console.log('person edited response ', response)
+          setNewName('');
+          setNewPNumber('');
+        })
+        .then(() => {
+          phonebookService
+          .getAll()
+          .then(persons => {
+            setPersons(persons)
+          })
+        })
+        .catch(error => {
+          console.log('Error happened during update of existing person ', error)
+        })
+      }
     } else {
       const newPerson = {name: newName, number: newPNumber}
-      const newPersons = persons.concat(newPerson);
       phonebookService
       .create(newPerson)
       .then(response => {
-        console.log('person added response ', response, newPersons)
+        console.log('person added response ', response)
         setNewName('');
         setNewPNumber('');
       })
