@@ -55,6 +55,11 @@ const App = () => {
             setTimeout(() => {
               setErrorMessage(null)
             }, 5000)
+          } else {
+            setErrorMessage(error.response.data.error)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           }
         })
       }
