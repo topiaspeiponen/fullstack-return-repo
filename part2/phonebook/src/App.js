@@ -79,7 +79,11 @@ const App = () => {
         })
       })
       .catch(error => {
-        console.log('Error happened during submission of new person ', error)
+        setErrorMessage(error.response.data.error)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+        console.log('Error happened during submission of new person ', error.response)
       })
       
       
